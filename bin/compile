@@ -35,8 +35,12 @@ if ! [ -f "$tarball_file" ]; then
 
 	mkdir -p "$HOME/.local/var/cache/nginx"
 
+	echo "Before compressing"
+
 	tar -czf "$tarball_file" -C "$HOME" .local
 fi
+
+echo "Before extracting"
 
 tar -xzf "$tarball_file" -C "$build_dir"
 mkdir "$build_dir/.profile.d"
