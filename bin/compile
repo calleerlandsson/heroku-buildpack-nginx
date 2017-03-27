@@ -9,8 +9,6 @@ version=1.11.12
 tarball_file="$cache_dir/nginx-$version.tar.gz"
 
 if ! [ -f "$tarball_file" ]; then
-	pushd "$(mktemp -d)"
-
 	curl -L "https://nginx.org/download/nginx-$version.tar.gz" | tar -xz
 
 	cd "nginx-$version"
@@ -38,8 +36,6 @@ if ! [ -f "$tarball_file" ]; then
 	mkdir -p "$HOME/.local/var/cache/nginx"
 
 	tar -czf "$tarball_file" -C "$HOME" .local
-
-	popd
 fi
 
 tar -xzf "$tarball_file" -C "$build_dir"
