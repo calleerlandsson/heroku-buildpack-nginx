@@ -42,6 +42,6 @@ if ! [ -f "$tarball_file" ]; then
 	popd
 fi
 
-tar -zxf "$tarball_file" -C "$build_dir"
+tar -xzf "$tarball_file" -C "$build_dir"
 mkdir "$build_dir/.profile.d"
 echo 'export PATH="$HOME/.local/usr/sbin:$PATH"' > "$build_dir/.profile.d/nginx.sh"
