@@ -8,7 +8,7 @@ cache_dir=$2
 version=1.11.12
 tarball_file="$cache_dir/nginx-$version.tar.gz"
 
-if ![ -f "$tarball_file" ]; then
+if ! [ -f "$tarball_file" ]; then
 	tempdir=$(mktemp -d)
 
 	curl -L "https://nginx.org/download/nginx-$version.tar.gz" | tar -xzC "$tempdir"
