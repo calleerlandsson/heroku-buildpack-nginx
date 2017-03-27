@@ -37,6 +37,7 @@ if ! [ -f "$tarball_file" ]; then
 
 	echo "Before compressing"
 
+	mkdir -p "$(dirname "$tarball_file""
 	tar -czf "$tarball_file" -C "$HOME" .local
 fi
 
