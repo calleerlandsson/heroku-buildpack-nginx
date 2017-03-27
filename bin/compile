@@ -13,6 +13,8 @@ if ! [ -f "$tarball_file" ]; then
 
 	curl -L "https://nginx.org/download/nginx-$version.tar.gz" | tar -xz
 
+	cd "nginx-$version"
+
 	./configure \
 		--prefix="$HOME/.local/etc/nginx" \
 		--sbin-path="$HOME/.local/usr/sbin/nginx" \
