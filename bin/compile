@@ -9,11 +9,11 @@ version=1.11.12
 tarball_file="$cache_dir/nginx-$version.tar.gz"
 
 if ! [ -f "$tarball_file" ]; then
-	tempdir=$(mktemp -d)
+	pushd "$(mktemp -d)"
 
-	curl -L "https://nginx.org/download/nginx-$version.tar.gz" | tar -xzC "$tempdir"
+	curl -L "https://nginx.org/download/nginx-$version.tar.gz" | tar -xz
 
-	"$tempdir/nginx-$version/configure" \
+	./configure \
 		--prefix="$HOME/.local/etc/nginx" \
 		--sbin-path="$HOME/.local/usr/sbin/nginx" \
 		--modules-path="$HOME/.local/usr/lib/nginx/modules" \
@@ -30,12 +30,14 @@ if ! [ -f "$tarball_file" ]; then
 		--with-http_ssl_module \
 		--with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2' \
 		--with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed -Wl,-rpath,$HOME/.local/lib"
-	make -C "$tempdir/nginx-$version"
-	make -C "$tempdir/nginx-$version" install
+	make
+	make install
 
 	mkdir -p "$HOME/.local/var/cache/nginx"
 
 	tar -czf "$tarball_file" -C "$HOME" .local
+
+	popd
 fi
 
 tar -zxf "$tarball_file" -C "$build_dir"
