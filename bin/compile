@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -e
+
+build_dir=$1
+cache_dir=$2
+
+version=1.11.12
+tarball_file="$cache_dir/nginx-$version.tar.gz"
+
+if ![ -f "$tarball_file" ]; then
+	tempdir=$(mktemp -d)
+
+	curl -L "https://nginx.org/download/nginx-$version.tar.gz" | tar -xzC "$tempdir"
+
+	"$tempdir/nginx-$version/configure" \
+		--prefix="$HOME/.local/etc/nginx" \
+		--sbin-path="$HOME/.local/usr/sbin/nginx" \
+		--modules-path="$HOME/.local/usr/lib/nginx/modules" \
+		--conf-path="$HOME/.local/etc/nginx/nginx.conf" \
+		--error-log-path=stderr \
+		--http-log-path=/dev/stdout \
+		--pid-path="$HOME/.local/var/run/nginx.pid" \
+		--lock-path="$HOME/.local/var/run/nginx.lock" \
+		--http-client-body-temp-path="$HOME/.local/var/cache/nginx/client_temp" \
+		--http-proxy-temp-path="$HOME/.local/var/cache/nginx/proxy_temp" \
+		--http-fastcgi-temp-path="$HOME/.local/var/cache/nginx/fastcgi_temp" \
+		--http-uwsgi-temp-path="$HOME/.local/var/cache/nginx/uwsgi_temp" \
+		--http-scgi-temp-path="$HOME/.local/var/cache/nginx/scgi_temp" \
+		--with-http_ssl_module \
+		--with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2' \
+		--with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed -Wl,-rpath,$HOME/.local/lib"
+	make -C "$tempdir/nginx-$version"
+	make -C "$tempdir/nginx-$version" install
+
+	mkdir -p "$HOME/.local/var/cache/nginx"
+
+	tar -czf "$tarball_file" -C "$HOME" .local
+fi
+
+tar -zxf "$tarball_file" -C "$build_dir"
+mkdir "$build_dir/.profile.d"
+echo 'export PATH="$HOME/.local/usr/sbin:$PATH"' > "$build_dir/.profile.d/nginx.sh"
