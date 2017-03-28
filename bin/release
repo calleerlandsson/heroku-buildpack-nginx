@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+cat <<'YAML'
+---
+addons: []
+default_process_types:
+  web: nginx -p . -c $(f=`mktemp`;erb nginx.conf.erb>$f;echo $f)
+YAML
