@@ -6,6 +6,8 @@ build_dir=$1
 cache_dir=$2
 bp_dir=$(dirname $(dirname $0))
 
+ls "$build_dir"
+
 version=1.11.12
 tarball_file="$cache_dir/nginx-$version.tar.gz"
 
