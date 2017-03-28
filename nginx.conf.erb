@@ -34,5 +34,11 @@ http {
 
   server {
     listen <%= ENV.fetch("PORT", 3000) %> reuseport;
+
+    <% if ENV["HTTPS_ONLY"] %>
+      if ($http_x_forwarded_proto != "https") {
+        return 301 https://$host$request_uri;
+      }
+    <% end %>
   }
 }
