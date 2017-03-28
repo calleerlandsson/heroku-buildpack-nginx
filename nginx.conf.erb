@@ -35,10 +35,22 @@ http {
   server {
     listen <%= ENV.fetch("PORT", 3000) %> reuseport;
 
+    <% if ENV["CANONICAL_HOST"] %>
+      server_name <%= ENV["CANONICAL_HOST"] %>;
+    <% end %>
+
     <% if ENV["HTTPS_ONLY"] %>
       if ($http_x_forwarded_proto != "https") {
         return 301 https://$host$request_uri;
       }
     <% end %>
   }
+
+  <% if ENV["CANONICAL_HOST"] %>
+    server {
+      listen <%= ENV.fetch("PORT", 3000) %> default_server reuseport;
+      server_name _;
+      return 301 <%= ENV["HTTPS_ONLY"] ? "https" : "$scheme" %>://<%= ENV["CANONICAL_HOST"] %>$request_uri;
+    }
+  <% end %>
 }
