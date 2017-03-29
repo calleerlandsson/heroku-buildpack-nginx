@@ -33,7 +33,7 @@ http {
   <% end %>
 
   server {
-    listen <%= ENV.fetch("PORT", 3000) %> reuseport;
+    listen <%= ENV["PORT"] %> reuseport;
 
     <% if ENV["CANONICAL_HOST"] %>
       server_name <%= ENV["CANONICAL_HOST"] %>;
@@ -48,7 +48,7 @@ http {
 
   <% if ENV["CANONICAL_HOST"] %>
     server {
-      listen <%= ENV.fetch("PORT", 3000) %> default_server;
+      listen <%= ENV["PORT"] %> default_server;
       server_name _;
       return 301 <%= ENV["HTTPS_ONLY"] ? "https" : "$scheme" %>://<%= ENV["CANONICAL_HOST"] %>$request_uri;
     }
