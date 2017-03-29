@@ -9,11 +9,16 @@ bp_dir=$(dirname $(dirname $0))
 version=1.11.12
 tarball_file="$cache_dir/nginx-$version.tar.gz"
 
-if ! [ -f "$tarball_file" ]; then
-	curl -L "https://nginx.org/download/nginx-$version.tar.gz" | tar -xz
+echo "-----> Installing NGINX $version"
 
+if [ -f "$tarball_file" ]; then
+	echo "       Extracting cached build results"
+else
+	echo "       Downloading source code from nginx.org"
+	curl -sL "https://nginx.org/download/nginx-$version.tar.gz" | tar -xz
+
+	echo "       Configuring and building NGINX"
 	cd "nginx-$version"
-
 	./configure \
 		--prefix="$HOME/.local/etc/nginx" \
 		--sbin-path="$HOME/.local/usr/sbin/nginx" \
@@ -30,12 +35,13 @@ if ! [ -f "$tarball_file" ]; then
 		--http-scgi-temp-path="$HOME/.local/var/cache/nginx/scgi_temp" \
 		--with-http_ssl_module \
 		--with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2' \
-		--with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed -Wl,-rpath,$HOME/.local/lib"
-	make
-	make install
-
+		--with-ld-opt="-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed -Wl,-rpath,$HOME/.local/lib" \
+		> /dev/null
+	make -s
+	make -s install
 	mkdir -p "$HOME/.local/var/cache/nginx"
 
+	echo "       Caching build results"
 	mkdir -p "$(dirname "$tarball_file")"
 	tar -czf "$tarball_file" -C "$HOME" .local
 fi
@@ -43,4 +49,10 @@ fi
 tar -xzf "$tarball_file" -C "$build_dir"
 mkdir "$build_dir/.profile.d"
 echo 'export PATH="$HOME/.local/usr/sbin:$PATH"' > "$build_dir/.profile.d/nginx.sh"
-cp -n "$bp_dir/nginx.conf.erb" "$build_dir/"
+
+if [ -f "$build_dir/nginx.conf.erb" ]; then
+	echo "       Found custom nginx.conf.erb"
+else
+	echo "       Using default nginx.conf.erb"
+	cp "$bp_dir/nginx.conf.erb" "$build_dir/"
+fi
