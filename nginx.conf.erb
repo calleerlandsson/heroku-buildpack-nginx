@@ -28,6 +28,8 @@ http {
   gzip_vary on;
   gzip_proxied any;
 
+  root <%= ENV.fetch("ROOT", "public") %>;
+
   <% if ENV["DEBUG"] %>
     rewrite_log on;
   <% end %>
